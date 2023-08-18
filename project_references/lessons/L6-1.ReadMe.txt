@@ -1,0 +1,64 @@
+In this lesson we will cover the whole of Ethereum and its applications.
+We will publish 2 lessons at once: lesson 6 and lesson 7
+because
+we want you to have as much material as possible and 
+as much time as possible for your projects.
+The project due date is to be published.
+However if you have a graduation deadline, you must turn in your project one week before your grade-turn-in deadline.
+
+So for lesson 6 we cover two topics:
+1. The Etherum blockchain: its structure and how it differs from the Bitcoin blockchain.
+2. How to program an Ethereum client, using:
+a. Solidity and Javascript programming languages
+b. One Javascript library: Web3.
+
+As regards the second topic, Ethereum client programming,
+we provide all the materials for this starting from zero.
+This will be a complete minicourse on Ethereum client programming.
+You will not get a similar minicourse anywhere else:
+most free tutorials in the internet, and 
+even some paid tutorials 
+are outdated due to changes.
+
+Not all the material in the minicourse is equally important.
+The most important part is:
+
+2.HelloWorld
+3.HelloWorldUI
+4.Web4Basics
+5.METACOIN
+6.Example - Dapp_mod
+7.Elections tutorial_WEB3UPDATED
+
+One option for your final project is to program a simple Ethereum client.
+Another option is to write a tutorial on Ethereum client programming
+for your own benefit, if you want to review these materials in the future.
+
+For lesson 7 we cover:
+the applications of Ethereum and other blockchains to many business areas,
+including the interaction of blockchain with the Internet Of Things (IoT),
+which, as engineers,
+you are probably aware of.
+One option for your final project is to write a research paper on 
+an application of the Ethereum blockchain to a business case,
+or, on a specialized blockchain buit to solve a business case.
+
+The client programming minicourse is very heavy.
+The Ethereum applications are heavy too.
+The reason is: there are lots of Demos that you can run and download.
+And videos of the Demos being run, to guide you in how to run them.
+As well as other videos of blockchain applications and discussions.
+And there is, of course, quite a bit of code in the form of self-contained Demo projects.
+Some of the Demos projects contain a Node Modules directory that is quite heavy.
+
+We have put all the materials for sessions 6 and 7 in a Google drive for you to download.
+The download should be quicker than from Quercus but still
+prepare yourself to wait a long while for the download to complete.
+
+You will also find a guidance for the final projects.
+This guidance is L6.ProjectGuide.txt
+You will see that you can do one of three types of projects.
+The guidance explains the three projects in detail.
+
+
+

@@ -1,0 +1,21 @@
+This being the last class on Bitcoin (the next 3 classes are on cryptography) we wanted to give an idea 
+of how one can trade a currency 
+while keeping volatility reasonably low.
+The traditional way of trading a currency is to use a pairs trading strategy where
+one trades a spread between currencies that one knows before hand 
+are currencies that track one another.
+However, although such a strategy can be applied to crypto-currencies 
+it is very hard to keep volatility reasonably low because
+crypto-currencies are extremely volatile.
+Nonetheless, we are going to show you 
+how pairs trading is done in the hope that
+such a strategy could be applied in the future, when
+crypto-currencies volatility has decreased.
+
+Because trading and investing are risky activities,
+we have devoted this class to the idea of arbitrage and
+discussed whether or not arbitrage exists in the world of crypto-currencies.
+Hopefully you will come away better informed about this subject
+and will not fall for a number of scams in the internet
+that convince users that arbitrages exist where they do not.
+
