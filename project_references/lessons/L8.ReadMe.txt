@@ -1,0 +1,49 @@
+This class will be about crypto currency valuation
+in particular Bitcoin valuation
+We saw in the first lesson that Bitcoin can be valued in a number of ways.
+Bitcoin can be viewed as:
+Commodity (mining costs)
+Currency (demand vs supply equation)
+Network (Metcalfe’s law of utility)
+Platform/Technology (Moore’s law)
+
+In this class we will dive into a model of Bitcoin's value as
+described by Metcalfe's law, 
+a law that measures the utility of a network.
+Originally it was applied to a telephone network, but 
+it can be applied to any network whose utility grows exponentially 
+with the number of users.
+
+This Metcalfe model is based on Timothy Peterson's paper, which
+you can find in the miscellaneous folder.
+We implemented Peterson's model using an Excel spreadsheet.
+The purpose of the Excel spreadsheet is to explain how the model works,
+but the real implementation is a Python program: gls.py, which
+you can also find in the miscellanous folder.
+The reason why we went through the trouble of displaying this model at length in Excel is that
+it is not a regular regression model, but instead 
+it is a special kind of regression called 
+"generalized differences" or "generalized least squares" or GLS.
+GLS exists because often when 
+one tries to use a regression to predict a time series 
+consisting of prices of a financial instrument
+the residuals of the regression will turn out to be auto-correlated.
+This means the regression will not be biased but 
+the predictions of the regression will range 
+over an interval that will be very wide,
+wider than it needs to be, and
+if one attempts to use the regression results 
+to calculate a confidence interval for the predictions
+this calculation will result in a confidence interval that is incorrect: 
+the confidence interval will be deceptively small.
+GLS attempts to correct a regular regression for the auto-correlation of the residuals.
+So we have tried to give you an idea of how a GLS model works.
+We have also included in miscellaneous a chapter of our favorite statistics textbook 
+(Wonnacott's) on how GLS works.
+
+
+We have also included a short presentation on
+how to value a crypto currency as though it were an investment project.
+This second presentation is not too detailed,
+but it gives a general idea of how such valuations are carried out.
+

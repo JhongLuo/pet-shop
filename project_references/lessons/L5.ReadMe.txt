@@ -1,0 +1,75 @@
+In this lesson we will discuss the Bitcoin simulation you are doing for your homework.
+The simulation you are running week is a version of of Arthur Gervais bitcoin simulator which is published on the web.
+The outputs of this simulation are very important for Bitcoin investors.
+The results prove conclusively that:
+Bitcoin's transaction per second speed cannot be changed, 
+not by increasing the block size,
+not by decreasing the time between blocks (that is, decreasing the difficulty level)
+If you do that, Bitcoin's security is compromised.
+So all those investors who are waiting for Bitcoin to become more efficient,
+can wait forever.
+It won't.
+Not unless Bitcoin decides to change its consensus algorithm.
+Substitute proof of work by some other consensus.
+
+One very interesting result of the Bitcoin simulation by Arthur Gervais is that
+that the Bitcoin network's security will become unstable once the minting of bitcoin stops (by 2040).
+The reason is that at that point the miner's only source of revenue will be the fees, and
+we cannot know if those fees will be enough to produce enough profit for the miners to remain honest.
+So after 2040 the miners will be more tempted than ever to become dishonest.
+How can they become dishonest?
+By engaging in selfish mining, which 
+is a topic that we covered last class, in slides 4 to 6 of 2.Bitcoin_Simulator_1.pptx.
+This is a pressing subject and yet
+no overall solution has yet been proposed at the level of the bitcoin network consensus algorithm (proof of work) that 
+deals effectively with selfish mining.
+Yet there are some recent approaches 
+propose that the solution to the selfish mining problem is best implemented 
+at the mining pool level, and
+not at the level of the bitcoin network consensus algorithm.
+In particular, recent approaches suggest that the solution lies in
+finding the correct equation that calculates the mining reward for miners that work in a mining pool.
+For more info see SelfishMiningSolutionForMiningPools.pdf in Miscellaneous.
+
+
+This is one reason why we believe that Bitcoin's consensus algorithm will probably be modified in the future.
+But what modifications are there that Bitcoin could implement.
+In this class we will cover this particular subject.
+
+So in this lesson we will discuss consensus algorithms in general.
+We will begin by providing a:
+History of Consensus Algorithms
+And we will cover:
+the Fischer-Lynch-Patterson Trilemma which establishes that
+a consensus algorithm is faced with a tradeoff between liveness and safety, it cannot have 100% of both.
+Liveness means that non-faulty processors eventually decide upon some output, and
+safety means that non-faulty processors agree on the correct output.
+This is a scholarly way of stating a private joke that runs in our family:
+when we were teaching the multiplication tables to our son,
+we would test him asking "what is 7 times 9" and
+he would answer: what do you want: velocity or precision?
+This is the same question that the Fischer-Lynch-Patterson Trilemma forces upon a consensus algorithm
+It has to choose.
+
+So there are many different consensus algorithms that depend upon this choice.
+The first one we will discuss is the earliest and most important:
+The Lamport, Shostak and Pease Byzantine Fault Tolerant Algorithm (BFT)
+BFT is important for you to understand because BFT form the basis
+of a whole family of algorithms that underlie Digital Ledger Technologies (DLTs).
+BFT quickly evolved into the well known
+Practical Byzantine Fault Tolerant Algorithms (PBFT)
+PBFT is a faster BFT that forms the basis of the Hyperledger Project DLTs, which 
+is an important open-source DLT library.
+
+After discussing PBFT we discuss another consensus family called:
+Proof of Stake Consensus
+Proof of Stake allows a miner to compete with other miners on the basis of money at "stake," 
+instead of on the basis of hashing power.
+
+Then we discuss how you can hybridize these various consensus algorithms
+Because you can hybridize the consensus algorithms, there are quite a few of them
+So it is important to have a way of evaluating them
+Therefore, in the latter part of the presentation we discuss an:
+Evaluation Table of Consensus Protocols
+We also discuss:
+The Factors Hampering the Application of Blockchain Technology

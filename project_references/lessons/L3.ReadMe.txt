@@ -1,0 +1,182 @@
+In this class we will discuss the following topics:
+Bitcoin as platform for other software running on top of it, and
+the Script language, which is Bitcoin's programming language
+this is a language that:
+is not "Touring complete" (no loops)
+is a stack language
+w/ added criptographic functions.
+
+You saw last class that:
+Each transaction in Bitcoin executes a cryptographic program
+that ensures the validity of the transaction.
+This cryptographic program is written in the language Script.
+The Script program inside a transaction is written in two parts:
+The locking program (or locking script) and the unlocking program (or unlocking script.)
+When the transaction is executed,
+the unlocking and locking sripts are executed in sequence.
+The concatenation of these two scripts
+(the locking script and the unlocking script)
+can be considered the simplest type of smart contract.
+
+In this class we are going to see:
+How the bitcoin blockchain can be used by third parties
+for enhanced bitcoin transactions
+(i.e. for transactions not only involving bitcoin but other assets as well).
+
+This is done by building another programming layer on top of the bitcoin blockchain
+
+We will not cover the details of the bitcoin language Script.
+Instead:
+will cover the various 
+types of transactions, and
+types of script templates
+to give an idea of the capabilities of the bitcoin blockchain
+in particular the "pay to script hash" template.
+
+
+The "pay to script hash" template enables
+a 3rd party to tell the bitcoin blockchain 
+to use as the unlocking script of a transaction a private script
+(not a standard unlocking script located on the blockchain, but
+a private unlocking script located on some particular blockchain node).
+
+This unlocking script would be a private customized smart contract.
+This scheme is very powerful:
+a business can impose any unlocking private script it wants 
+on the coins that the business controls
+Meanwhile the customer's bitcoin wallet does not have to do anything out of the ordinary
+to send payments to the business via the blockchain, and
+the customer's wallet can continue to operate on the basis 
+of the default (out of the box) script that comes with the wallet
+so no special programming update of the customer's wallet is needed.
+
+Indeed the "pay to script hash" program is
+the first "smart contract" because it is customized.
+It is also peculiar in that it is a private contract
+stored in the wallet of the business
+until the business executes a transaction that requires it.
+
+An obvious use case for the "pay to script hash" template is escrow arrangements.
+An escrow is a contractual arrangement in which 
+a third party receives and 
+disburses money or property for the primary transacting parties, with 
+the disbursement dependent on conditions agreed to by the transacting parties.
+
+Although we do NOT cover the details of bitcoin's script in our lecture,
+we do cover:
+What is the logical framework that 
+forces bitcoin users to be honest.
+The motto of the bitcoin network is that it is trustless 
+(users need not place their trust in the platform).
+So how is this trustlessness achieved?
+How are transactions coupled so as to
+reward honest users and punish dishonest users?
+This is what the lecture covers.
+
+You will see that the core strategy is called the
+"Bond-refund-payment" pattern.
+This is a pattern that
+replicates a "bond based" contract.
+A "bond based" contract has three parts:
+a bond, a payment and a refund.
+The bond is a security deposit controlled by the participants.
+The payment and the refund are exactly what you think they are.
+The "bond-refund-payment" pattern
+can be thought of as a "double-spend-transaction-set" where 
+only one sibling transaction is published (the "all is well" transaction)
+and the other (the "punishment" transaction) is kept unpublished.
+This "bond-refund-payment" pattern is the basis of many security schemes 
+not just in the Bitcoin blockchain but in blockchains generally.
+The pattern is simple but can be made more powerful
+with the addition of other devices such as:
+timelocks and
+hashlocks.
+For example,
+the addition of a timelock that
+makes it impossible for the participants to holdout forever.
+
+If you understand the Bond-refund-payment pattern
+and how it can be extended by using timelocks and hashlocks
+which we cover also in this lesson,
+you understand the basics of all smart contracts.
+
+We also discuss how the bitcoin blockchain
+can be used as a database to store 3rd party data,
+or rather, hashed versions of this data, which
+are of fixed length and very compressed,
+(you already know what a hash is,
+so you know what I am talking about).
+
+One of the use cases of this storage (database) capacity of the Bitcoin network
+is called "colored coins," which
+is an application layer that can be built 
+on top of the Bitcoin blockchain layer,
+and which functions like for example a ticketing agency
+that uses dollar bills for tickets.
+
+In the context of "colored coins,"
+an important use case for the "bond-refund-payment" pattern is
+the "Atomic trade" or "atomic swap."
+An "atomic swap" is a smart contract technology that enables 
+the exchange or swap of one cryptocurrency for another in a single transaction,
+or in the case of "colored coins"
+one crytocurrency coin for any kind of asset
+or any kind of asset (i.e. a stock) for any kind of asset (i.e. another stock).
+
+This "atomic swap" happens
+without using centralized intermediaries, such as exchanges,
+simply because of the way 
+the transaction is structured.
+An "atomic transaction" is strutured in such a way that the buyer cannot run away with the goods
+and the seller cannot run away with the payment.
+The concept of an "atomic transaction" is a security concept that
+is central to all blockchains.
+
+Finally we discuss 
+a particular type of "Bond-refund-payment" pattern
+called "Hashed timelock contract"  or HTLC,
+which involves hashlocks and timelocks.
+This type of contract is used for payment relays.
+Payment relays are way of transferring bitcoin through 3rd parties
+minimizing any risk.
+HTLCs are also used in the Lightning Network, that is
+is an important second layer that has been built on top of the Bitcoin network
+whose purpose is to enable millions of parallel super fast transansactions.
+
+The transactions of the Lightning Network
+are so fast they can be used for video payment.
+
+You will see that the Bitcoin network suffers from a
+strutural cap on transactions per second.
+To our knowledge there are only two solutions for this limitation
+on Bitcoin's throughput:
+one solution is the Lightning Network
+the other is Polkadot.
+
+The Lightning Network is a very exciting solution
+and it is growing in popularity.
+In the resources part of the presentation
+you will see slides about the Lightning Network.
+The Lightning Network Exchange Sparkswap and
+the Lightning Network Wallet.
+
+But the most interesting slide in the presentation
+we have to confess is the last slide.
+That slide contains a number of links to videos that discuss the Lightning Network.
+In particular it links to 2 videos:
+1. How The Banks Bought Bitcoin and Lightning Network
+2. Bitcoin Q and A: Misconceptions about Lightning Network (Antonopoulos)
+These two videos lay out an ongoing debate that
+has to date been unresolved, and
+it is important and interesting to watch the two sides of this debate, which 
+is why we have included links to both videos in this last slide.
+
+The Lightning Network is very interesting not only because it is fast,
+but also because it protects the privacy of the transactions better than 
+the Bitcoin network does.
+But on the other hand, using the Lightning Network requires even more knowledge and care
+than is required for transacting regularly on the Bitcoin network.
+
+
+
+
