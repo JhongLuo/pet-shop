@@ -6,11 +6,13 @@ App = {
   breeds: [],
 
   init: async function() {
+
     $('#breed, #age, #location, #adopted').change(
       async function() {
         await App.getPets();
         App.renderPets();
     });
+
     return await App.initWeb3();
   },
 
@@ -54,10 +56,29 @@ App = {
     return App.bindEvents();
   },
 
+  validTime: function () {
+    const invalidDays = [8.20]; // Adjust as needed
+    
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentHour = now.toLocaleTimeString();
+    
+    const isValidTimeRange = currentHour >= 9 && currentHour <= 17;
+    const isValidDay = !invalidDays.includes(currentDay);
+    const isWeekday = !(currentDay === 0 || currentDay === 6);
+
+    const isValid = isValidTimeRange && isValidDay && isWeekday;
+    
+    return isValid;
+  },
+
+
   bindEvents: function() {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
     $(document).on('click', '.btn-unadopt', App.handleUnAdopt);
+    $(document).on('click', '.btn-register', App.handleRegister);
   },
+
 
   refreshCounts: function() {
     App.contracts.Adoption.deployed().then(function(instance) {
@@ -77,6 +98,7 @@ App = {
     });
   },
   
+
   renderPets: async function() {
     var petsRow = $('#petsRow');
     var petTemplate = $('#petTemplate');
@@ -209,6 +231,44 @@ App = {
       console.log(err.message);
     });
   },
+
+  handleRegister: function(event) {
+    event.preventDefault();
+    time_limit = false;
+
+    if (time_limit && !App.validTime()) {
+      alert("Transaction disabled at current time")
+      return
+    }
+
+    var pet = {
+      "name": $("#reg-name").val(),
+      "imgurl": $("#reg-imgurl").val(),
+      "age": parseInt($("#reg-age").val()),
+      "breed": $("#reg-breed").val(),
+      "location": $("#reg-location").val(),
+    }
+
+    console.log("pet register catched: ", pet)
+    var adoptionInstance;
+
+    web3.eth.getAccounts(function(err, accounts) {
+      if (err) {
+        console.log(err.message);
+      }
+      var account = accounts[0];
+
+      App.contracts.Adoption.deployed().then(function(instance) {
+        adoptionInstance = instance;
+        return adoptionInstance.addPet(pet.name, pet.age, pet.breed, pet.location, pet.imgurl, {from: account})
+      }).then(function(result){
+        location.reload();
+      }).catch(function (err){
+        console.log(err.message);
+      })
+    }
+  },
+
 };
 
 $(function() {
