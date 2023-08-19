@@ -1,33 +1,20 @@
 App = {
   web3Provider: null,
   contracts: {},
-  accounts : null,
+  accounts : [],
   pets: [],
+  breeds: [],
+
   init: async function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var breedDropdown = $('#breed');
-      var breeds = [...new Set(data.map(pet => pet.breed))];
-      breeds.forEach(breed => {
-        breedDropdown.append($('<option></option>').attr('value', breed).text(breed));
-      });
-  
-      App.renderPets(data);
-    });
-  
-    $('#breed, #age, #location, #adopted').change(function() {
-      $.getJSON('../pets.json', function(data) {
-        var filteredData = App.filterPets(data);
-        App.renderPets(filteredData);
-      });
+
+    $('#breed, #age, #location, #adopted').change(
+      async function() {
+        await App.getPets();
+        App.renderPets();
     });
 
-    // constants for invalid dates
-    
-    
-    
     return await App.initWeb3();
-  },  
+  },
 
   initWeb3: async function() {
     // Modern dapp browsers...
@@ -137,25 +124,54 @@ App = {
     }
     console.log('Pets rendered')
   },
-  
+
+  refreshFilter: function() {
+    var breedDropdown = $('#breed'); 
+    console.log("refreshing filter")
+    App.breeds.forEach(breed => {
+      breedDropdown.append($('<option></option>').attr('value', breed).text(breed));
+    });
+  },
+
   getPets: async function() {
+    var breed = $('#breed').val();
+    var age = $('#age').val();
+    var location = $('#location').val().toLowerCase();
+    var adopted = $('#adopted').prop('checked');
+
     instance = await App.contracts.Adoption.deployed()
     var totalPets = await instance.totalPets();
+    App.pets = [];
     for (let i = 0; i < totalPets; i++) {
-      let pet = await instance.getPet(i);
-      App.pets.push({
-        id: i,
-        name: pet[0],
-        age: parseInt(pet[1]),
-        breed: pet[2],
-        location: pet[3],
-        image: pet[4],
-        adopters: pet[5],
-        adopted: pet[6],
-        reward: parseInt(pet[7])
-      });
+      let pull_pet = true;
+      if (breed) {
+        pull_pet = await instance.checkPetBreed(i, breed);
+      }
+      if (pull_pet && age) {
+        pull_pet = await instance.checkPetAge(i, age);
+      }
+      if (pull_pet && location) {
+        pull_pet = await instance.checkPetLocation(i, location);
+      }
+      if (pull_pet && adopted) {
+        pull_pet = await instance.checkPetAdoptionStatus(i, true);
+      }
+      console.log(i, pull_pet, ' pull_pet')
+      if (pull_pet) {
+        let pet = await instance.getPet(i);
+        App.pets.push({
+          id: i,
+          name: pet[0],
+          age: parseInt(pet[1]),
+          breed: pet[2],
+          location: pet[3],
+          image: pet[4],
+          adopters: pet[5],
+          adopted: pet[6],
+          reward: parseInt(pet[7])
+        });
+      }
     }
-    console.log(App.pets)
   },
 
   getAccounts: async function() {
@@ -169,21 +185,30 @@ App = {
     );
   },
 
+  getBreeds: async function() {
+    var instance = await App.contracts.Adoption.deployed();
+    var breeds = await instance.getAllBreeds();
+    breeds = [...new Set(breeds)];
+    App.breeds = breeds.filter(breed => breed !== "");
+    console.log(App.breeds)
+  },
 
   refresh: async function() {
     await App.getAccounts();
     await App.getPets();
+    await App.getBreeds();
     App.renderPets();
     App.refreshCounts();
+    App.refreshFilter();
   },
 
   handleAdopt: function(event) {
     event.preventDefault();
-    var petId = parseInt($(event.target).data('id'));
+    var seq = parseInt($(event.target).data('id'));
+    var petId = App.pets[seq].id;
     var adoptionInstance;
     App.contracts.Adoption.deployed().then(function(instance) {
       adoptionInstance = instance;
-      // Execute adopt as a transaction by sending account
       return adoptionInstance.adopt(petId, {from: App.accounts[0]});
     }).then(function(result) {
       return App.refresh();
@@ -194,7 +219,8 @@ App = {
 
   handleUnAdopt: function(event) {
     event.preventDefault();
-    var petId = parseInt($(event.target).data('id'));
+    var seq = parseInt($(event.target).data('id'));
+    var petId = App.pets[seq].id;
     var adoptionInstance;
     App.contracts.Adoption.deployed().then(function(instance) {
       adoptionInstance = instance;
@@ -204,24 +230,6 @@ App = {
     }).catch(function(err) {
       console.log(err.message);
     });
-  },
-
-  filterPets: function(data) {
-    var breed = $('#breed').val();
-    var age = $('#age').val();
-    var location = $('#location').val().toLowerCase();
-    var adopted = $('#adopted').prop('checked');
-    
-    var isPetAdopted = $(`.panel-pet[data-id="${pet.id}"]`).hasClass('btn-unadopt');
-    
-    var filteredData = data.filter(pet =>
-      (!breed || pet.breed === breed) &&
-      (!age || pet.age == age) &&
-      (!location || pet.location.toLowerCase().includes(location)) &&
-      (!adopted || isPetAdopted === adopted)
-    );
-    
-    return filteredData;
   },
 
   handleRegister: function(event) {
@@ -260,6 +268,7 @@ App = {
       })
     }
   },
+
 };
 
 $(function() {
