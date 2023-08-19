@@ -110,37 +110,37 @@ App = {
         petTemplate.find('.pet-age').text(pet.age);
         petTemplate.find('.pet-breed').text(pet.breed);
         petTemplate.find('.pet-location').text(pet.location);
-        petTemplate.find('.pet-reward').text(pet.reward); 
+        petTemplate.find('.pet-reward').text(web3.fromWei(pet.reward, 'ether')); 
         let adoptersList = pet.adopters;
         let [current, previous] = App.splitAdopters(adoptersList, pet.adopted);
-        if (current !== null) {
-          petTemplate.find('.current-adopter').text(`Current Adopter:\n${current}`);
-        } else {
-          petTemplate.find('.current-adopter').text('');
-        }
-        if (previous !== null && previous.length > 0) {
-          petTemplate.find('.previous-adopters').text(`Previous Adopters:\n${previous.join(',\n')}`);
-        } else{
-          petTemplate.find('.previous-adopters').text('');
-        }
+        console.log(current, previous, i)
         if (adoptersList.length === 0) {
           petTemplate.find('.previous-adopters').text('No Adopters History');
         } else {
-          petTemplate.find('.previous-adopters').text('');
+          if (current !== null) {
+            petTemplate.find('.current-adopter').text(`Current Adopter:\n${current}`);
+          } else {
+            petTemplate.find('.current-adopter').text('');
+          }
+          if (previous !== null && previous.length > 0) {
+            petTemplate.find('.previous-adopters').text(`Previous Adopters:\n${previous.join(',\n')}`);
+          } else{
+            petTemplate.find('.previous-adopters').text('');
+          }
         }
         petTemplate.find('img').attr('src', pet.image);
 
         if (pet.adopted === true) {
           if (pet.adopters[pet.adopters.length - 1] === App.accounts[0]) {
-            petTemplate.find('button.btn-adopt').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
+            petTemplate.find('button.btn-adoption').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
             petTemplate.find('.reward-details').hide();
           } else {
-            petTemplate.find('button.btn-adopt').text('Already Adopted By Others').attr('disabled', true);
+            petTemplate.find('button.btn-adoption').text('Already Adopted By Others').attr('disabled', true);
           }
           petTemplate.find('button.btn-add-reward').hide(); // Hide the "Add Reward" button if the pet is adopted
         } else {
           petTemplate.find('.reward-details').show();
-          petTemplate.find('button.btn-adopt').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
+          petTemplate.find('button.btn-adoption').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
         }
         
         petTemplate.find('button').attr('data-id', i);
@@ -171,13 +171,20 @@ App = {
 
   // Function to handle clicking the "Submit Reward" button
   handleSubmitRewardClick: function() {
-    $(document).on('click', '.btn-submit-reward', function() {
+    $(document).on('click', '.btn-submit-reward', function(event) {
+      event.preventDefault();
       let rewardAmount = $(this).siblings('.reward-amount').val();
       $(this).siblings('.reward-amount').val(null);
-      let petId = parseInt($(this).data('id'));
-      console.log(rewardAmount);
-      console.log(petId);
-
+      var seq = parseInt($(event.target).data('id'));
+      var petId = App.pets[seq].id;
+      App.contracts.Adoption.deployed().then(function(instance) {
+        return instance.addReward(petId, {from: App.accounts[0], value: web3.toWei(rewardAmount, 'ether')});
+      }).then(function(result) {
+        return App.refresh();
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+  
     });
   },
   
@@ -269,10 +276,8 @@ App = {
     event.preventDefault();
     var seq = parseInt($(event.target).data('id'));
     var petId = App.pets[seq].id;
-    var adoptionInstance;
     App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;
-      return adoptionInstance.unAdopt(petId, {from: App.accounts[0], value: web3.toWei(1 + App.pets[petId].reward, 'ether')});
+      return instance.unAdopt(petId, {from: App.accounts[0], value: web3.toWei(1 + App.pets[petId].reward, 'ether')});
     }).then(function(result) {
       return App.refresh();
     }).catch(function(err) {
