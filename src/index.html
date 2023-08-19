@@ -77,8 +77,25 @@
             <br/><br/>
             <strong>Breed</strong>: <span class="pet-breed">Golden Retriever</span><br/>
             <strong>Age</strong>: <span class="pet-age">3</span><br/>
-            <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/><br/>
-            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+            <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/>
+            <strong>Reward</strong>: <span class="pet-reward">0</span> ETH<br/>
+            <details class="pet-details">
+              <summary class="pet-summary">View Adopter Details</summary>
+              <div class="pet-adopters">
+                <div class="current-adopter"></div>
+                <div class="previous-adopters"></div>
+              </div>
+            </details>
+            <div class="button-group">
+              <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+              <details class="reward-details pull-right" style="display: none; ">
+                <summary class="btn btn-default" data-id="0" >Add Reward</summary>
+                <div class="reward-form" style="position: absolute; top: 68%; right: 15px; background: rgb(209, 241, 183); padding: 10px; border: 2px solid #ccc;">
+                  <input type="number" class="reward-amount" placeholder="Enter Reward Amount">
+                  <button class="btn btn-default btn-submit-reward" type="button">Submit</button>
+                </div>
+              </details>
+            </div>
           </div>
         </div>
       </div>
@@ -189,4 +206,51 @@
   .filter-item input[type="submit"]:hover {
     background-color: #0056b3;
   }
+
+  .pet-summary::before {
+    content: '►'; /* Arrow symbol */
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .pet-details[open] .pet-summary::before {
+    transform: rotate(90deg); /* Rotates the arrow symbol when details are open */
+  }
+  
+  .pet-details {
+    position: relative; /* Positioning context for the floating details */
+  }
+  
+  .pet-details > div.pet-adopters {
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    background-color: #f9f9f9; 
+    border: 2px solid #ddd; 
+    padding: 15px; 
+    width: auto; 
+    box-sizing: border-box; 
+    z-index: 1; 
+    display: none; 
+    overflow: auto; 
+  }
+  
+  .pet-details[open] > div.pet-adopters {
+    display: block; /* Shows the details when the <details> tag is open */
+  }
+
+  .current-adopter {
+    font-weight: bold; /* Makes the current adopter's text bold */
+    margin-bottom: 10px; /* Adds space between current and previous adopters */
+  }
+  
+  .previous-adopters {
+    font-style: italic; /* Makes the previous adopters' text italic */
+  }
+
+  .button-group {
+    margin-top: 8px;
+  }
+  
 </style>

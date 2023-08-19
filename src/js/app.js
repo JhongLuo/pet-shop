@@ -12,6 +12,7 @@ App = {
         breedDropdown.append($('<option></option>').attr('value', breed).text(breed));
       });
     });  
+    this.handleSubmitRewardClick();
     return await App.initWeb3();
   },  
 
@@ -88,20 +89,66 @@ App = {
         petTemplate.find('.pet-age').text(pet.age);
         petTemplate.find('.pet-breed').text(pet.breed);
         petTemplate.find('.pet-location').text(pet.location);
+        petTemplate.find('.pet-reward').text(pet.reward); 
+        let adoptersList = pet.adopters;
+        let [current, previous] = App.splitAdopters(adoptersList, pet.adopted);
+        if (current !== null) {
+          petTemplate.find('.current-adopter').text(`Current Adopter:\n${current}`);
+        } else {
+          petTemplate.find('.current-adopter').text('');
+        }
+        if (previous !== null && previous.length > 0) {
+          petTemplate.find('.previous-adopters').text(`Previous Adopters:\n${previous.join(',\n')}`);
+        } else{
+          petTemplate.find('.previous-adopters').text('');
+        }
+        if (adoptersList.length === 0) {
+          petTemplate.find('.previous-adopters').text('No Adopters History');
+        } else {
+          petTemplate.find('.previous-adopters').text('');
+        }
         petTemplate.find('img').attr('src', pet.image);
+
         if (pet.adopted === true) {
           if (pet.adopters[pet.adopters.length - 1] === App.accounts[0]) {
-            petTemplate.find('button').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
+            petTemplate.find('button.btn-adopt').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
+            petTemplate.find('.reward-details').hide();
           } else {
-            petTemplate.find('button').text('Already Adopted').attr('disabled', true);
+            petTemplate.find('button.btn-adopt').text('Already Adopted By Others').attr('disabled', true);
           }
+          petTemplate.find('button.btn-add-reward').hide(); // Hide the "Add Reward" button if the pet is adopted
         } else {
-          petTemplate.find('button').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
+          petTemplate.find('.reward-details').show();
+          petTemplate.find('button.btn-adopt').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
         }
+        
         petTemplate.find('button').attr('data-id', i);
         petsRow.append(petTemplate.html());
     }
     console.log('Pets rendered')
+  },
+  
+  splitAdopters: function(adoptersList, isAdopted) {
+    if (adoptersList.length === 0) {return [null, []];}
+    adoptersList.reverse();
+    if (isAdopted) {
+      let current = adoptersList[0];
+      let previous = adoptersList.slice(1, adoptersList.length);
+      return [current, previous];
+    }
+    return [null, adoptersList];
+  },
+
+  // Function to handle clicking the "Submit Reward" button
+  handleSubmitRewardClick: function() {
+    $(document).on('click', '.btn-submit-reward', function() {
+      let rewardAmount = $(this).siblings('.reward-amount').val();
+      $(this).siblings('.reward-amount').val(null);
+      let petId = parseInt($(this).data('id'));
+      console.log(rewardAmount);
+      console.log(petId);
+
+    });
   },
   
   getPets: async function() {
