@@ -110,7 +110,10 @@ contract Adoption {
     pets[petId].adopters.push(msg.sender);
     pets[petId].adopted = true;
     // give reward to the pet owner
-    payable(msg.sender).transfer(pets[petId].reward);
+    if (pets[petId].reward > 0) {
+      require(address(this).balance >= pets[petId].reward, "Contract has insufficient funds");
+      payable(msg.sender).transfer(pets[petId].reward);
+    }
     // update the count
     servedCount += 1;
     adoptedCount += 1;
@@ -123,11 +126,8 @@ contract Adoption {
     require(pets[petId].adopters[pets[petId].adopters.length - 1] == msg.sender, "You are not the owner of this pet");
     // calculate the total unAdoption fee and pay it
     uint totalUnAdoptionFee = unAdoptFee + pets[petId].reward;
-    if (unAdoptFee + pets[petId].reward < pets[petId].reward) {
-      totalUnAdoptionFee = pets[petId].reward;
-    }
     require(msg.value >= totalUnAdoptionFee, "You need to pay the unadopt fee");
-    contractOwner.transfer(unAdoptFee);
+    contractOwner.transfer(totalUnAdoptionFee);
     // update adoption status
     pets[petId].adopted = false;
     pets[petId].reward = 0;
@@ -144,7 +144,6 @@ contract Adoption {
     require(msg.value > 0, "You need to pay some reward");
     require(pets[petId].reward + msg.value > pets[petId].reward, "The reward is too big");
     pets[petId].reward += msg.value;
-    contractOwner.transfer(msg.value);
     return petId;
   }
 }
