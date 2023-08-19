@@ -22,6 +22,34 @@ contract Adoption {
   uint public addPetFee = 1 ether;
   uint public unAdoptFee = 1 ether;
   
+  function getAllBreeds() public view returns (string[] memory) {
+    string[] memory breeds = new string[](totalPets);
+    for (uint i = 0; i < totalPets; i++) {
+      breeds[i] = pets[i].breed;
+    }
+    return breeds;
+  }
+
+  function checkPetAdoptionStatus(uint index, bool adopted) public view returns (bool) {
+    require(index < totalPets, "PetId is not valid");
+    return pets[index].adopted == adopted;
+  }
+
+  function checkPetLocation(uint index, string memory location) public view returns (bool) {
+    require(index < totalPets, "PetId is not valid");
+    return keccak256(abi.encodePacked(pets[index].location)) == keccak256(abi.encodePacked(location));
+  }
+
+  function checkPetBreed(uint index, string memory breed) public view returns (bool) {
+    require(index < totalPets, "PetId is not valid");
+    return keccak256(abi.encodePacked(pets[index].breed)) == keccak256(abi.encodePacked(breed));
+  }
+
+  function checkPetAge(uint index, uint age) public view returns (bool) {
+    require(index < totalPets, "PetId is not valid");
+    return pets[index].age == age;
+  }
+
   function getPet(uint index) public view returns (
     string memory name,
     uint age,
