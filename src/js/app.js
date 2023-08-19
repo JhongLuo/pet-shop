@@ -20,7 +20,11 @@ App = {
         App.renderPets(filteredData);
       });
     });
-  
+
+    // constants for invalid dates
+    
+    
+    
     return await App.initWeb3();
   },  
 
@@ -63,6 +67,23 @@ App = {
 
     return App.bindEvents();
   },
+
+  validTime: function () {
+    const invalidDays = [8.20]; // Adjust as needed
+    
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentHour = now.toLocaleTimeString();
+    
+    const isValidTimeRange = currentHour >= 9 && currentHour <= 17;
+    const isValidDay = !invalidDays.includes(currentDay);
+    const isWeekday = !(currentDay === 0 || currentDay === 6);
+
+    const isValid = isValidTimeRange && isValidDay && isWeekday;
+    
+    return isValid;
+  },
+
 
   bindEvents: function() {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
