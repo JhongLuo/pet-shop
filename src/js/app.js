@@ -25,28 +25,26 @@ App = {
   },  
 
   initWeb3: async function() {
-
     // Modern dapp browsers...
-if (window.ethereum) {
-  App.web3Provider = window.ethereum;
-  try {
-    // Request account access
-    await window.ethereum.enable();
-  } catch (error) {
-    // User denied account access...
-    console.error("User denied account access")
-  }
-}
-// Legacy dapp browsers...
-else if (window.web3) {
-  App.web3Provider = window.web3.currentProvider;
-}
-// If no injected web3 instance is detected, fall back to Ganache
-else {
-  App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-}
-web3 = new Web3(App.web3Provider);
-
+    if (window.ethereum) {
+      App.web3Provider = window.ethereum;
+      try {
+        // Request account access
+        await window.ethereum.enable();
+      } catch (error) {
+        // User denied account access...
+        console.error("User denied account access")
+      }
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+      App.web3Provider = window.web3.currentProvider;
+    }
+    // If no injected web3 instance is detected, fall back to Ganache
+    else {
+      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+    }
+    web3 = new Web3(App.web3Provider);
     return App.initContract();
   },
 
@@ -60,7 +58,7 @@ web3 = new Web3(App.web3Provider);
       App.contracts.Adoption.setProvider(App.web3Provider);
     
       // Use our contract to retrieve and mark the adopted pets
-      return App.markAdopted();
+      return App.refresh();
     });
 
     return App.bindEvents();
@@ -68,31 +66,62 @@ web3 = new Web3(App.web3Provider);
 
   bindEvents: function() {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('click', '.btn-unadopt', App.handleUnAdopt);
   },
 
-  markAdopted: function(adopters, account) {
+  refreshCounts: function() {
+    App.contracts.Adoption.deployed().then(function(instance) {
+      return instance.getAdoptedCount.call();
+    }).then(function(adoptedCount) {
+      $('#adoptedCount').text('Adopted Pets: ' + adoptedCount);
+    }).catch(function(err) {
+      console.log(err.message + 'at Adopted Pets');
+    });
+  
+    App.contracts.Adoption.deployed().then(function(instance) {
+      return instance.getServedCount.call();
+    }).then(function(servedCount) {
+      $('#customerCount').text('Served Requests: ' + servedCount);
+    }).catch(function(err) {
+      console.log(err.message + 'at Served Requests');
+    });
+  },
+  
+
+  refresh: function(adopters, account) {
     var adoptionInstance;
 
     App.contracts.Adoption.deployed().then(function(instance) {
       adoptionInstance = instance;
-    
       return adoptionInstance.getAdopters.call();
-    }).then(function(adopters) {
-      for (i = 0; i < adopters.length; i++) {
-        if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
-          $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
+    }).then(function(adopters, account) {
+      web3.eth.getAccounts(function(error, accounts) {
+        if (error) {
+          console.log(error);
         }
-      }
+        var account = accounts[0];
+        for (i = 0; i < adopters.length; i++) {
+          console.log(adopters[i], account)
+          if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
+            if (adopters[i] === account) {
+              $('.panel-pet').eq(i).find('button').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
+            } else {
+              $('.panel-pet').eq(i).find('button').text('Already Adopted').attr('disabled', true);
+            }
+          } else {
+            $('.panel-pet').eq(i).find('button').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
+          }
+        }
+      });
     }).catch(function(err) {
       console.log(err.message);
     });
+    App.refreshCounts();
   },
 
   handleAdopt: function(event) {
     event.preventDefault();
-
     var petId = parseInt($(event.target).data('id'));
-
     var adoptionInstance;
 
     web3.eth.getAccounts(function(error, accounts) {
@@ -108,7 +137,32 @@ web3 = new Web3(App.web3Provider);
         // Execute adopt as a transaction by sending account
         return adoptionInstance.adopt(petId, {from: account});
       }).then(function(result) {
-        return App.markAdopted();
+        return App.refresh();
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+
+  handleUnAdopt: function(event) {
+    event.preventDefault();
+    var petId = parseInt($(event.target).data('id'));
+    var adoptionInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+    
+      var account = accounts[0];
+    
+      App.contracts.Adoption.deployed().then(function(instance) {
+        adoptionInstance = instance;
+    
+        // Execute adopt as a transaction by sending account
+        return adoptionInstance.unAdopt(petId, {from: account});
+      }).then(function(result) {
+        return App.refresh();
       }).catch(function(err) {
         console.log(err.message);
       });
