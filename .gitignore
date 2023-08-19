@@ -1,1 +1,8 @@
 node_modules
+build/contracts/Migrations.json
+build/contracts/Adoption.json
+.vscode/settings.json
+package-lock.json
+package.json
+package-lock.json
+package-lock.json

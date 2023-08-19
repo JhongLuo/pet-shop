@@ -87,7 +87,6 @@ App = {
     });
   },
   
-
   refresh: function(adopters, account) {
     var adoptionInstance;
 
@@ -160,7 +159,7 @@ App = {
         adoptionInstance = instance;
     
         // Execute adopt as a transaction by sending account
-        return adoptionInstance.unAdopt(petId, {from: account});
+        return adoptionInstance.unAdopt(petId, {from: account, value: web3.toWei(1, 'ether')});
       }).then(function(result) {
         return App.refresh();
       }).catch(function(err) {
