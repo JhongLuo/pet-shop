@@ -175,12 +175,14 @@ App = {
     var location = $('#location').val().toLowerCase();
     var adopted = $('#adopted').prop('checked');
     
-    var filteredData = data.filter(function(pet) {
-      return (!breed || pet.breed === breed) &&
-             (!age || pet.age == age) &&
-             (!location || pet.location.toLowerCase().indexOf(location) !== -1) &&
-             (!adopted || pet.adopted === adopted);
-    });
+    var isPetAdopted = $(`.panel-pet[data-id="${pet.id}"]`).hasClass('btn-unadopt');
+    
+    var filteredData = data.filter(pet =>
+      (!breed || pet.breed === breed) &&
+      (!age || pet.age == age) &&
+      (!location || pet.location.toLowerCase().includes(location)) &&
+      (!adopted || isPetAdopted === adopted)
+    );
     
     return filteredData;
   },
@@ -197,8 +199,6 @@ App = {
       petTemplate.find('.pet-age').text(data[i].age);
       petTemplate.find('.pet-location').text(data[i].location);
       petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
-      // Add an extra field to handle the adopted status
-      petTemplate.find('.btn-adopt').data('adopted', data[i].adopted);
   
       petsRow.append(petTemplate.html());
     }
