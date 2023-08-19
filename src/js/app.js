@@ -5,23 +5,24 @@ App = {
   init: async function() {
     // Load pets.
     $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
-
-      for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
-
-        petsRow.append(petTemplate.html());
-      }
+      var breedDropdown = $('#breed');
+      var breeds = [...new Set(data.map(pet => pet.breed))];
+      breeds.forEach(breed => {
+        breedDropdown.append($('<option></option>').attr('value', breed).text(breed));
+      });
+  
+      App.renderPets(data);
     });
-
+  
+    $('#breed, #age, #location, #adopted').change(function() {
+      $.getJSON('../pets.json', function(data) {
+        var filteredData = App.filterPets(data);
+        App.renderPets(filteredData);
+      });
+    });
+  
     return await App.initWeb3();
-  },
+  },  
 
   initWeb3: async function() {
 
@@ -112,7 +113,43 @@ web3 = new Web3(App.web3Provider);
         console.log(err.message);
       });
     });
-  }
+  },
+
+  filterPets: function(data) {
+    var breed = $('#breed').val();
+    var age = $('#age').val();
+    var location = $('#location').val().toLowerCase();
+    var adopted = $('#adopted').prop('checked');
+    
+    var filteredData = data.filter(function(pet) {
+      return (!breed || pet.breed === breed) &&
+             (!age || pet.age == age) &&
+             (!location || pet.location.toLowerCase().indexOf(location) !== -1) &&
+             (!adopted || pet.adopted === adopted);
+    });
+    
+    return filteredData;
+  },
+  
+  renderPets: function(data) {
+    var petsRow = $('#petsRow');
+    var petTemplate = $('#petTemplate');
+    petsRow.empty();
+  
+    for (i = 0; i < data.length; i++) {
+      petTemplate.find('.panel-title').text(data[i].name);
+      petTemplate.find('img').attr('src', data[i].picture);
+      petTemplate.find('.pet-breed').text(data[i].breed);
+      petTemplate.find('.pet-age').text(data[i].age);
+      petTemplate.find('.pet-location').text(data[i].location);
+      petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+      // Add an extra field to handle the adopted status
+      petTemplate.find('.btn-adopt').data('adopted', data[i].adopted);
+  
+      petsRow.append(petTemplate.html());
+    }
+  },
+  
 
 };
 
