@@ -266,7 +266,7 @@ App = {
       }).catch(function (err){
         console.log(err.message);
       })
-    }
+    })
   },
 
 };
