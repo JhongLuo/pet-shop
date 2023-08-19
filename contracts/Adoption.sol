@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
 
 contract Adoption {
   
@@ -20,10 +21,33 @@ contract Adoption {
   uint public totalPets = 0;
   uint public addPetFee = 1 ether;
   uint public unAdoptFee = 1 ether;
+  
+  function getPet(uint index) public view returns (
+    string memory name,
+    uint age,
+    string memory breed,
+    string memory location,
+    string memory image,
+    address[] memory adopters,
+    bool adopted,
+    uint reward
+  ) {
+    require(index < totalPets, "PetId is not valid");
+    Pet memory pet = pets[index];
+    return (
+      pet.name,
+      pet.age,
+      pet.breed,
+      pet.location,
+      pet.image,
+      pet.adopters,
+      pet.adopted,
+      pet.reward
+    );
+  }
 
-
-  constructor() public {
-    contractOwner = msg.sender;
+  constructor() {
+    contractOwner = payable(msg.sender);
     pets.push(Pet("Frieda", 3, "Scottish Terrier", "Lisco, Alabama", "images/scottish-terrier.jpeg", new address[](0), false, 0));
     pets.push(Pet("Gina", 3, "Scottish Terrier", "Tooleville, West Virginia", "images/scottish-terrier.jpeg", new address[](0), false, 0));
     pets.push(Pet("Collins", 2, "French Bulldog", "Freeburn, Idaho", "images/french-bulldog.jpeg", new address[](0), false, 0));
@@ -40,6 +64,7 @@ contract Adoption {
     pets.push(Pet("Kristina", 4, "Golden Retriever", "Sultana, Massachusetts", "images/golden-retriever.jpeg", new address[](0), false, 0));
     pets.push(Pet("Ethel", 2, "Golden Retriever", "Broadlands, Oregon", "images/golden-retriever.jpeg", new address[](0), false, 0));
     pets.push(Pet("Terry", 2, "Golden Retriever", "Dawn, Wisconsin", "images/golden-retriever.jpeg", new address[](0), false, 0));
+    totalPets = 16;
   }
 
   function addPet(string memory name, uint age, string memory breed, string memory location, string memory image) public payable returns (uint) {
@@ -57,7 +82,7 @@ contract Adoption {
     pets[petId].adopters.push(msg.sender);
     pets[petId].adopted = true;
     // give reward to the pet owner
-    msg.sender.transfer(pets[petId].reward);
+    payable(msg.sender).transfer(pets[petId].reward);
     // update the count
     servedCount += 1;
     adoptedCount += 1;
