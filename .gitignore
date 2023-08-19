@@ -1,1 +1,4 @@
 node_modules
+build/contracts/Migrations.json
+build/contracts/Adoption.json
+.vscode/settings.json

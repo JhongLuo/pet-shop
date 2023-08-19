@@ -1,6 +1,7 @@
+
 App = {
-  web3Provider: null,
-  contracts: {},
+  web3: null,
+  contract: null,
 
   init: async function() {
     // Load pets.
@@ -15,7 +16,6 @@ App = {
         petTemplate.find('.pet-age').text(data[i].age);
         petTemplate.find('.pet-location').text(data[i].location);
         petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
-
         petsRow.append(petTemplate.html());
       }
     });
@@ -24,40 +24,30 @@ App = {
   },
 
   initWeb3: async function() {
-    // Modern dapp browsers...
+    // Check if web3 is available
     if (window.ethereum) {
-      App.web3Provider = window.ethereum;
-      try {
-        // Request account access
-        await window.ethereum.enable();
-      } catch (error) {
-        // User denied account access...
-        console.error("User denied account access")
+        if (typeof window.ethereum !== 'undefined') {
+          // Use the browser injected Ethereum provider
+          App.web3 = new Web3(window.ethereum);
+          // Request access to the user's MetaMask account
+          window.ethereum.enable();
+          // Get the user's accounts
+          App.web3.eth.getAccounts().then(function (accounts) {
+              // Show the first account
+              console.log('Connected with MetaMask account: ' + accounts[0]);
+          });
       }
     }
-    // Legacy dapp browsers...
-    else if (window.web3) {
-      App.web3Provider = window.web3.currentProvider;
-    }
-    // If no injected web3 instance is detected, fall back to Ganache
-    else {
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-    }
-    web3 = new Web3(App.web3Provider);
     return App.initContract();
   },
 
   initContract: function() {
-    $.getJSON('Adoption.json', function(data) {
-      // Get the necessary contract artifact file and instantiate it with truffle-contract
-      var AdoptionArtifact = data;
-      App.contracts.Adoption = TruffleContract(AdoptionArtifact);
-    
-      // Set the provider for our contract
-      App.contracts.Adoption.setProvider(App.web3Provider);
-    
-      // Use our contract to retrieve and mark the adopted pets
-      return App.refresh();
+    $.getJSON("Adoption.json", function(data) {
+      const contractABI = data.abi;
+      console.log(data.networks)
+      const contractAddress = data.networks['5777'].address;
+      App.contract = new App.web3.eth.Contract(contractABI, contractAddress);
+      App.contract.setProvider(App.web3.currentProvider);
     });
 
     return App.bindEvents();
@@ -69,38 +59,33 @@ App = {
   },
 
   refreshCounts: function() {
-    App.contracts.Adoption.deployed().then(function(instance) {
-      return instance.getAdoptedCount.call();
-    }).then(function(adoptedCount) {
-      $('#adoptedCount').text('Adopted Pets: ' + adoptedCount);
+    App.contract.methods.getAdoptedCount.call()
+    .then(
+      function(adoptedCount) {
+        $('#adoptedCount').text('Adopted Pets: ' + adoptedCount);
     }).catch(function(err) {
       console.log(err.message + 'at Adopted Pets');
     });
   
-    App.contracts.Adoption.deployed().then(function(instance) {
-      return instance.getServedCount.call();
-    }).then(function(servedCount) {
-      $('#customerCount').text('Served Requests: ' + servedCount);
+    App.contract.methods.getServedCount.call()
+    .then(
+      function(servedCount) {
+        $('#customerCount').text('Served Requests: ' + servedCount);
     }).catch(function(err) {
       console.log(err.message + 'at Served Requests');
     });
   },
   
 
-  refresh: function(adopters, account) {
-    var adoptionInstance;
-
-    App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;
-      return adoptionInstance.getAdopters.call();
-    }).then(function(adopters, account) {
-      web3.eth.getAccounts(function(error, accounts) {
+  refresh: function() {
+    App.contract.methods.getAdopters.call()
+    .then(function(adopters, account) {
+      App.web3.eth.getAccounts(function(error, accounts) {
         if (error) {
           console.log(error);
         }
         var account = accounts[0];
         for (i = 0; i < adopters.length; i++) {
-          console.log(adopters[i], account)
           if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
             if (adopters[i] === account) {
               $('.panel-pet').eq(i).find('button').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
@@ -121,46 +106,28 @@ App = {
   handleAdopt: function(event) {
     event.preventDefault();
     var petId = parseInt($(event.target).data('id'));
-    var adoptionInstance;
-
-    web3.eth.getAccounts(function(error, accounts) {
-      if (error) {
-        console.log(error);
-      }
-    
-      var account = accounts[0];
-    
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
-    
-        // Execute adopt as a transaction by sending account
-        return adoptionInstance.adopt(petId, {from: account});
-      }).then(function(result) {
-        return App.refresh();
-      }).catch(function(err) {
-        console.log(err.message);
+    App.web3.eth.getAccounts().then(function(accounts) {
+      App.contract.methods.adopt(petId).send({ from: accounts[0] })
+      .then(function(result) {
+        console.log('Pet has been adopted, Transaction Result:', result);
+      })
+      .catch(function(error) {
+        console.error('Error in adopting pet:', error);
       });
     });
+
+    return App.refresh();
   },
 
   handleUnAdopt: function(event) {
     event.preventDefault();
     var petId = parseInt($(event.target).data('id'));
-    var adoptionInstance;
-
-    web3.eth.getAccounts(function(error, accounts) {
+    App.web3.eth.getAccounts(function(error, accounts) {
       if (error) {
         console.log(error);
       }
-    
       var account = accounts[0];
-    
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
-    
-        // Execute adopt as a transaction by sending account
-        return adoptionInstance.unAdopt(petId, {from: account});
-      }).then(function(result) {
+      App.contract.methods.unAdopt(petId, { from: account, value: App.web3.utils.toWei('1', 'ether')  }).then(function(result) {
         return App.refresh();
       }).catch(function(err) {
         console.log(err.message);
