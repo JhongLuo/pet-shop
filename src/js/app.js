@@ -12,8 +12,6 @@ App = {
         await App.getPets();
         App.renderPets();
     });
-	this.handleSubmitRewardClick();
-
     return await App.initWeb3();
   },
 
@@ -78,6 +76,7 @@ App = {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
     $(document).on('click', '.btn-unadopt', App.handleUnAdopt);
     $(document).on('click', '.btn-register', App.handleRegister);
+    $(document).on('click', '.btn-submit-reward', App.handleSubmitReward);
   },
 
 
@@ -170,9 +169,7 @@ App = {
     return [null, adoptersList];
   },
 
-  // Function to handle clicking the "Submit Reward" button
-  handleSubmitRewardClick: function() {
-    $(document).on('click', '.btn-submit-reward', function(event) {
+  handleSubmitReward: function(event) {
       event.preventDefault();
       let rewardAmount = $(this).siblings('.reward-amount').val();
       $(this).siblings('.reward-amount').val(null);
@@ -186,15 +183,13 @@ App = {
       }).catch(function(err) {
         console.log(err.message);
       });
-  
-    });
   },
   
   getPets: async function() {
     var breed = $('#breed').val();
     var age = $('#age').val();
     var location = $('#location').val().toLowerCase();
-    var adopted = $('#adopted').prop('checked');
+    var adoptionStatus = $('#adopted').val();
 
     instance = await App.contracts.Adoption.deployed()
     var totalPets = await instance.totalPets();
@@ -210,8 +205,12 @@ App = {
       if (pull_pet && location) {
         pull_pet = await instance.checkPetLocation(i, location);
       }
-      if (pull_pet && adopted) {
-        pull_pet = await instance.checkPetAdoptionStatus(i, true);
+      if (pull_pet && adoptionStatus) {
+        if (adoptionStatus === 'Adopted') {
+          pull_pet = await instance.checkPetAdoptionStatus(i, true);
+        } else if (adoptionStatus === 'Unadopted') {
+          pull_pet = await instance.checkPetAdoptionStatus(i, false);
+        }
       }
       if (pull_pet) {
         let pet = await instance.getPet(i);

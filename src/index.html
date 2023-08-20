@@ -58,7 +58,11 @@
             </div>
             <div class="filter-item">
               <label for="adopted">Adopted:</label>
-              <input type="checkbox" id="adopted">
+              <select id="adopted">
+                <option value="" selected>Please Select A Status</option>
+                <option value="Adopted" selected>Adopted</option>
+                <option value="Unadopted" selected>Unadopted</option>
+              </select>
             </div>
           </div>
         </div>
@@ -67,7 +71,7 @@
       <div class="row">
         <div class="col-md-12 text-center">
           <form class="filter-container">
-            <h4>New Post</h4>
+            <h4>Create a pet</h4>
             <div class="filter-item">
               <label for="reg-name">Name:</label>
               <input type="text" id="reg-name" required><br>
@@ -164,13 +168,13 @@
     margin: 0 auto; /* Center align the container */
     width: 80%; /* Adjust the width as desired */
     background-color: #f4f4f4;
-    padding: 20px;
+    padding: 5px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
 
   .filter-item {
-    margin: 10px 0;
+    margin: 5px 0;
   }
 
   .filter-item label {
