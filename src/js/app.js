@@ -257,8 +257,8 @@ App = {
         location.reload();
       }).catch(function (err){
         console.log(err.message);
-      })
-    }
+      });
+    });
   },
 };
 
