@@ -78,7 +78,9 @@
             <strong>Breed</strong>: <span class="pet-breed">Golden Retriever</span><br/>
             <strong>Age</strong>: <span class="pet-age">3</span><br/>
             <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/>
-            <strong>Reward</strong>: <span class="pet-reward">0</span> ETH<br/>
+            <div class="reward-section">
+              <strong>Reward</strong>: <span class="pet-reward">0</span> ETH<br/>
+            </div>
             <details class="pet-details">
               <summary class="pet-summary">View Adopter Details</summary>
               <div class="pet-adopters">
@@ -117,12 +119,7 @@
   
           <div class="filter-item">
             <label for="reg-breed">Breed:</label>
-            <select id="reg-breed" required>
-              <option value="labrador">Labrador</option>
-              <option value="poodle">Poodle</option>
-              <option value="bulldog">Bulldog</option>
-              <!-- Add more options as needed -->
-            </select><br>
+            <input type="text" id="reg-breed" required><br>
           </div>
   
           <div class="filter-item">
@@ -136,7 +133,7 @@
           </div>
   
           <div class="filter-item">
-            <input type="submit" value="Submit" id="btn-register">
+            <input type="button" class="btn-register" value="Submit" id="btn-register">
           </div>
         </form>
       </div>
@@ -253,4 +250,13 @@
     margin-top: 8px;
   }
   
+  .crop-image {
+    width: 260px;          
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+
 </style>

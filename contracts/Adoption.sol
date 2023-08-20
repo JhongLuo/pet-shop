@@ -11,7 +11,7 @@ contract Adoption {
     string image;
     address[] adopters;
     bool adopted;
-    uint reward;
+    uint256 reward;
   }
 
   Pet[] public pets;
@@ -19,8 +19,8 @@ contract Adoption {
   uint public servedCount = 0;
   uint public adoptedCount = 0;
   uint public totalPets = 0;
-  uint public addPetFee = 1 ether;
-  uint public unAdoptFee = 1 ether;
+  uint256 public addPetFee = 1 ether;
+  uint256 public unAdoptFee = 1 ether;
   
   function getAllBreeds() public view returns (string[] memory) {
     string[] memory breeds = new string[](totalPets);
@@ -58,7 +58,7 @@ contract Adoption {
     string memory image,
     address[] memory adopters,
     bool adopted,
-    uint reward
+    uint256 reward
   ) {
     require(index < totalPets, "PetId is not valid");
     Pet memory pet = pets[index];
@@ -125,7 +125,7 @@ contract Adoption {
     require(pets[petId].adopted, "Pet is not adopted");
     require(pets[petId].adopters[pets[petId].adopters.length - 1] == msg.sender, "You are not the owner of this pet");
     // calculate the total unAdoption fee and pay it
-    uint totalUnAdoptionFee = unAdoptFee + pets[petId].reward;
+    uint256 totalUnAdoptionFee = unAdoptFee + pets[petId].reward;
     require(msg.value >= totalUnAdoptionFee, "You need to pay the unadopt fee");
     contractOwner.transfer(totalUnAdoptionFee);
     // update adoption status

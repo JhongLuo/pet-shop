@@ -113,7 +113,6 @@ App = {
         petTemplate.find('.pet-reward').text(web3.fromWei(pet.reward, 'ether')); 
         let adoptersList = pet.adopters;
         let [current, previous] = App.splitAdopters(adoptersList, pet.adopted);
-        console.log(current, previous, i)
         if (adoptersList.length === 0) {
           petTemplate.find('.previous-adopters').text('No Adopters History');
         } else {
@@ -128,9 +127,10 @@ App = {
             petTemplate.find('.previous-adopters').text('');
           }
         }
-        petTemplate.find('img').attr('src', pet.image);
+        petTemplate.find('img').attr('src', pet.image).addClass('crop-image');
 
         if (pet.adopted === true) {
+          petTemplate.find('.reward-section').hide();
           if (pet.adopters[pet.adopters.length - 1] === App.accounts[0]) {
             petTemplate.find('button.btn-adoption').text('Unadopt').removeClass('btn-adopt').addClass('btn-unadopt').attr('disabled', false);
             petTemplate.find('.reward-details').hide();
@@ -139,6 +139,7 @@ App = {
           }
           petTemplate.find('button.btn-add-reward').hide(); // Hide the "Add Reward" button if the pet is adopted
         } else {
+          petTemplate.find('.reward-section').show();
           petTemplate.find('.reward-details').show();
           petTemplate.find('button.btn-adoption').text('Adopt').removeClass('btn-unadopt').addClass('btn-adopt').attr('disabled', false);
         }
@@ -175,6 +176,7 @@ App = {
       event.preventDefault();
       let rewardAmount = $(this).siblings('.reward-amount').val();
       $(this).siblings('.reward-amount').val(null);
+      console.log("reward amount: ", rewardAmount)
       var seq = parseInt($(event.target).data('id'));
       var petId = App.pets[seq].id;
       App.contracts.Adoption.deployed().then(function(instance) {
@@ -211,7 +213,6 @@ App = {
       if (pull_pet && adopted) {
         pull_pet = await instance.checkPetAdoptionStatus(i, true);
       }
-      console.log(i, pull_pet, ' pull_pet')
       if (pull_pet) {
         let pet = await instance.getPet(i);
         App.pets.push({
@@ -223,7 +224,7 @@ App = {
           image: pet[4],
           adopters: pet[5],
           adopted: pet[6],
-          reward: parseInt(pet[7])
+          reward: pet[7],
         });
       }
     }
@@ -245,7 +246,6 @@ App = {
     var breeds = await instance.getAllBreeds();
     breeds = [...new Set(breeds)];
     App.breeds = breeds.filter(breed => breed !== "");
-    console.log(App.breeds)
   },
 
   refresh: async function() {
@@ -277,7 +277,7 @@ App = {
     var seq = parseInt($(event.target).data('id'));
     var petId = App.pets[seq].id;
     App.contracts.Adoption.deployed().then(function(instance) {
-      return instance.unAdopt(petId, {from: App.accounts[0], value: web3.toWei(1 + App.pets[petId].reward, 'ether')});
+      return instance.unAdopt(petId, {from: App.accounts[0], value: (web3.toWei(1 + Number(web3.fromWei(App.pets[petId].reward, 'ether')), 'ether'))});
     }).then(function(result) {
       return App.refresh();
     }).catch(function(err) {
@@ -285,14 +285,8 @@ App = {
     });
   },
 
-  handleRegister: function(event) {
+  handleRegister: async function(event) {
     event.preventDefault();
-    time_limit = false;
-
-    if (time_limit && !App.validTime()) {
-      alert("Transaction disabled at current time")
-      return
-    }
 
     var pet = {
       "name": $("#reg-name").val(),
@@ -301,27 +295,12 @@ App = {
       "breed": $("#reg-breed").val(),
       "location": $("#reg-location").val(),
     }
-
     console.log("pet register catched: ", pet)
-    var adoptionInstance;
-
-    web3.eth.getAccounts(function(err, accounts) {
-      if (err) {
-        console.log(err.message);
-      }
-      var account = accounts[0];
-
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
-        return adoptionInstance.addPet(pet.name, pet.age, pet.breed, pet.location, pet.imgurl, {from: account})
-      }).then(function(result){
-        location.reload();
-      }).catch(function (err){
-        console.log(err.message);
-      })
-    })
+    instance = await App.contracts.Adoption.deployed()
+    result = await instance.addPet(pet.name, pet.age, pet.breed, pet.location, pet.imgurl, {from: App.accounts[0], value: web3.toWei(1, 'ether')});
+    console.log("pet register result: ", result)
+    await App.refresh();
   },
-
 };
 
 $(function() {
